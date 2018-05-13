@@ -29,9 +29,13 @@ function S3Transport (options) {
   this.options = options;
   this.options.bucketName = options.bucketName;
   this.options.bucketRegion = options.bucketRegion;
+  this.options.accessKeyId = options.accessKeyId || process.env.AWS_ACCESS_KEY_ID;
+  this.options.secretAccessKey = options.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY;
 
   if (!options.bucketName) throw TypeError('S3Transport: Missing required option "bucketName"');
   if (!options.bucketRegion) throw TypeError('S3Transport: Missing required option "bucketRegion"');
+  if (!options.accessKeyId) throw TypeError('S3Transport: Missing required option "accessKeyId"');
+  if (!options.secretAccessKey) throw TypeError('S3Transport: Missing required option "secretAccessKey"');
 
   this.name = 'S3';
   this.version = packageData.version;
@@ -57,6 +61,8 @@ S3Transport.prototype.send = function send (mail, callback) {
 
   // Upload zip stream to S3.
   var messageS3 = new S3({
+    accessKeyId: this.options.accessKeyId,
+    secretAccessKey: this.options.secretAccessKey,
     region: this.options.bucketRegion,
     params: {
       Bucket: this.options.bucketName,
